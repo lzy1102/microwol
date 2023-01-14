@@ -4,10 +4,9 @@ import _thread
 import time
 from machine import Pin, Timer
 import btree
-from uctypes import struct
+import ustruct
 from urequests import urequests
 import wifimgr  # 这个模块名称务必要与上述WiFiManager模块文件名一致
-
 
 # wlan = wifimgr.get_connection()
 # if wlan is None:
@@ -19,11 +18,18 @@ import wifimgr  # 这个模块名称务必要与上述WiFiManager模块文件名
 # # Main Code goes here, wlan is a working network.WLAN(STA_IF) instance.
 # print("ESP OK")
 
+LED_BLINK = True
+
 
 def led():
     p2 = Pin(12, Pin.OUT)
     p3 = Pin(13, Pin.OUT)
     while True:
+        if not LED_BLINK:
+            p2.off()
+            p3.off()
+            time.sleep(1000)
+            continue
         p2.on()
         p3.off()
         time.sleep_ms(500)
@@ -50,7 +56,7 @@ def connectWifi():
     wlan = network.WLAN(network.STA_IF)  # create station interface
     wlan.active(True)  # activate the interface
     wlan.disconnect()
-    wlan.connect('忆享科技-1', 'yxkj@123')  # connect to an AP
+    wlan.connect('yangdabao', 'lizhiyong418')  # connect to an AP
     time.sleep(5)
     if wlan.isconnected():
         print(wlan.ifconfig())  # get the interface's IP/netmask/gw/DNS addresses
@@ -67,19 +73,19 @@ def wake_up(mac='DC-4A-3E-78-3E-0A'):
 
     # 把原始数据转换为16进制字节数组，
     for i in range(0, len(data), 2):
-        send_data = b''.join([send_data, struct.pack('B', int(data[i: i + 2], 16))])
+        send_data = b''.join([send_data, ustruct.pack('B', int(data[i: i + 2], 16))])
     print(send_data)
 
     # 通过socket广播出去，为避免失败，间隔广播三次
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.sendto(send_data, (BROADCAST, 7))
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.sendto(send_data, (BROADCAST, 9))
         time.sleep(1)
-        sock.sendto(send_data, (BROADCAST, 7))
+        sock.sendto(send_data, (BROADCAST, 9))
         time.sleep(1)
-        sock.sendto(send_data, (BROADCAST, 7))
-
+        sock.sendto(send_data, (BROADCAST, 9))
+        sock.close()
         print("Done")
     except Exception as e:
 
@@ -87,6 +93,7 @@ def wake_up(mac='DC-4A-3E-78-3E-0A'):
 
 
 def main():
+    global LED_BLINK
     print('----所有线程开始执行----')
     # serverWifi()
     # 创建互斥锁
@@ -102,12 +109,22 @@ def main():
     print('----主程序正在执行----')
     connectWifi()
     while True:
-        time.sleep_ms(10000)
-        resp = urequests.get("http://106.12.129.198:5000/get")
-        if resp.text == "1":
-            print("开机")
-            wake_up(mac="2C-60-0C-1C-62-B6")
-            urequests.get("http://106.12.129.198:5000/set?status=0")
+        time.sleep_ms(20000)
+        print("循环开始")
+        try:
+            resp = urequests.get("http://106.12.129.198:5000/get")
+            print(resp.status_code)
+            if str(resp.status_code) != "200":
+                continue
+            if resp.text == "1":
+                LED_BLINK=True
+                print("开机")
+                wake_up(mac="E0-D5-5E-7D-B9-EA")
+                time.sleep_ms(5000)
+                urequests.get("http://106.12.129.198:5000/set?status=0")
+        except Exception as e:
+            print("获取状态错误", e)
+        LED_BLINK=False
 
 
 if __name__ == '__main__':
