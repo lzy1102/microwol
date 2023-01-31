@@ -85,7 +85,7 @@ def get_key():
         return "mac is null"
     tmp = StartUp.query.filter_by(mac=mac).first()
     if tmp is None:
-        shark=str(random.random())
+        shark = str(random.random())
         result = hashlib.md5(str(mac + shark).encode()).hexdigest()
         db.session.add(StartUp(mac=mac, key=result, status="0"))
         db.session.commit()
