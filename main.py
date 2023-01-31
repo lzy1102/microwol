@@ -44,15 +44,16 @@ def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
 
 
 def main():
-    ssid = "xxx"
-    password = "xxx"
+    ssid = "test666"
+    password = "123456789"
     mac = "E0-D5-5E-7D-B9-EA"
     broadcast = "192.168.3.255"  # 广播地址
     port = 7  # 7 或者 9
-    api = "http://api.xinjing123.top:5000"
-    key = "***"
+    api = "http://192.168.43.191:5000"
+    key = "583a80ba213d9361891994488f7715e8"
     connectWifi(ssid=ssid, password=password)
     while True:
+        time.sleep(10000)
         try:
             resp = urequests.get(api + "/get/status", params={"mac": mac, "key": key})
             print(resp.status_code)
@@ -61,7 +62,7 @@ def main():
             if resp.text == "1":
                 print("开机")
                 wake_up(mac=mac, broadcast=broadcast, port=port)
-                time.sleep_ms(10000)
+                time.sleep(10000)
                 urequests.get(api + "/set/status", params={"mac": mac, "key": key, "status": 0})
         except Exception as e:
             print("获取状态错误", e)
