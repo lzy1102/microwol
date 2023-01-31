@@ -53,19 +53,18 @@ def main():
     key = "583a80ba213d9361891994488f7715e8"
     connectWifi(ssid=ssid, password=password)
     while True:
+        time.sleep_ms(10000)
         try:
-            resp = urequests.get(api + "/get/status", params={"mac": mac, "key": key})
-            print(resp.status_code)
+            resp = urequests.get(url=api + "/getstatus", params={"mac": mac, "key": key})
             if str(resp.status_code) != "200":
                 continue
             if resp.text == "1":
                 print("开机")
                 wake_up(mac=mac, broadcast=broadcast, port=port)
-                time.sleep(10)
-                urequests.get(api + "/set/status", params={"mac": mac, "key": key, "status": 0})
+                time.sleep_ms(10000)
+                urequests.get(url=api + "/setstatus", params={"mac": mac, "key": key, "status": 0})
         except Exception as e:
             print("获取状态错误", e)
-    time.sleep(10)
 
 
 if __name__ == '__main__':

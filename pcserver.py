@@ -43,7 +43,7 @@ def validate_mac(value):
             return False
 
 
-@app.route('/set/status', methods=["GET"])
+@app.route('/setstatus', methods=["GET"])
 def set_status():
     status = request.args.get("status")
     key = request.args.get("key")
@@ -63,7 +63,7 @@ def set_status():
         return tmp.status
 
 
-@app.route('/get/status', methods=["GET"])
+@app.route('/getstatus')
 def get_status():
     key = request.args.get("key")
     mac = request.args.get("mac")
@@ -78,7 +78,7 @@ def get_status():
         return tmp.status
 
 
-@app.route("/get/key", methods=["GET"])
+@app.route("/getkey", methods=["GET"])
 def get_key():
     mac = request.args.get("mac")
     if mac == "" or mac is None or validate_mac(mac) is False:
