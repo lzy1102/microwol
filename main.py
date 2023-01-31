@@ -48,7 +48,7 @@ def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
 def main():
     ssid = "xxx"
     password = "xxx"
-    mac = "E0-D5-5E-7D-B9-EA"
+    mac = "XX-XX-XX-XX-XX-XX"
     broadcast = "192.168.3.255"  # 广播地址
     port = 7  # 7 或者 9
     api = "http://api.xinjing123.top:5000"
