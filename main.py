@@ -16,8 +16,6 @@ def connectWifi(ssid, password):
 
 
 def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
-    # MAC = mac
-    # BROADCAST = "192.168.3.255"
     if len(mac) != 17:
         raise ValueError("MAC address should be set as form 'XX-XX-XX-XX-XX-XX'")
     mac_address = mac.replace("-", '')
