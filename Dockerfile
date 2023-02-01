@@ -5,8 +5,8 @@ RUN set -x \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/timezone \
 
-ADD pcserver.py /opt
-ADD requirements.txt /opt
+COPY pcserver.py /opt
+COPY requirements.txt /opt
 WORKDIR /opt
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 CMD ["tail", "-f", "/dev/null"]
