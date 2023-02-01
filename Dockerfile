@@ -6,8 +6,6 @@ RUN set -x \
     && echo "Asia/Shanghai" > /etc/timezone \
 COPY pcserver.py /opt
 COPY requirements.txt /opt
-RUN set -x \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
-
 WORKDIR /opt
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 CMD ["python3","pcserver.py"]
