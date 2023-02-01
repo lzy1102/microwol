@@ -9,4 +9,4 @@ COPY pcserver.py /opt
 COPY requirements.txt /opt
 WORKDIR /opt
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
-CMD ["tail", "-f", "/dev/null"]
+CMD ["python3", "pcserver.py"]
