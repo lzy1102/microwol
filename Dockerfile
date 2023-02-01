@@ -7,5 +7,7 @@ RUN set -x \
 COPY pcserver.py /opt
 COPY requirements.txt /opt
 RUN set -x \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt \
-CMD ["python","pcserver.py"]
+    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+
+WORKDIR /opt
+CMD ["python3","pcserver.py"]
