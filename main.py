@@ -49,7 +49,7 @@ def main():
     mac = "E0-D5-5E-7D-B9-EA"
     broadcast = "192.168.3.255"  # 广播地址
     port = 7  # 7 或者 9
-    api = "http://api.xinjing123.top:5000"
+    api = "http://106.12.129.198:5000"
     key = "583a80ba213d9361891994488f7715e8"
     connectWifi(ssid=ssid, password=password)
     while True:
