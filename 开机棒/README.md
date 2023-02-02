@@ -3,18 +3,16 @@
 main.py 是需要上传到板子上的程序，主要配置有以下几项
 
 ```python
-ssid = "test666"   # 自己家的wifi名字，要和台式机在同一网段
-password = "123456789"  #自家wifi密码
-mac = "E0-D5-5E-7D-B9-EA"  #台式机MAC地址
-broadcast = "192.168.3.255"  # 路由广播地址
-port = 7  # 7 或者 9
-api = "http://106.12.129.198:5000"  # 如果自己搭建服务器，换成自己的，如果不自己搭建，可以用我得
-key = "583a80ba213d9361891994488f7715e8"  # 从服务获取到的key
+SERVER = 'broker.emqx.io'  # mqtt 服务器地址
+MAC_ADDR = '40-E2-30-B1-31-E5'  # mac地址，
+TOPIC = '0622306f5a6a39ed99441934f532c8e1'.encode()   # 服务器获取到的key,mqtt的topic地址
+ssid = "test666"    # 自家wifi地址
+password = "123456789"  # 自家wifi 密码
 ```
 
 key的获取方法如下
 
-http://106.12.129.198:5000/getkey?mac=xxxxxxx
+http://106.12.129.198:5000/getkey
 
 将mac地址替换成自己的mac即可
 
@@ -22,9 +20,14 @@ http://106.12.129.198:5000/getkey?mac=xxxxxxx
 
 开机直接浏览器请求 
 
-http://106.12.129.198:5000/setstatus?mac=xxxxxxxxx&key=388888888888888888845&status=1
+http://106.12.129.198:5000/setstatus?mac=40-E2-30-B1-31-E5&key=xxxxxxxxxxxxxxxx&broadcast=192.168.3.255&port=7
 
-status=1的时候执行开机，开机后会自动设置成0
+```python
+mac = 'xxxxx'  # 自己要开机的电脑的mac地址
+key  # 获取到的key
+broadcast # 自家路由器的广播地址  192.168.3.255
+port  # 电脑上魔法包的接受地址 通常是 9 或者 7
+```
 
 搭配向日葵，就可以随时随地对家里的电脑进行开机，并远程了
 

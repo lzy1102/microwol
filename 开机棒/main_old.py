@@ -1,20 +1,7 @@
-import socket
-
-import json
 import network
+import socket
 import time
-from machine import Pin
 import ustruct
-
-led1 = Pin(12, Pin.OUT)
-led1.off()
-led2 = Pin(13, Pin.OUT)
-led2.off()
-
-SERVER = 'broker.emqx.io'  # broker.mqttdashboard.com
-TOPIC = '2f9ba5b550c97a5616c768db7b9aaa88'.encode()
-ssid = "test666"
-password = "123456789"
 
 
 def connectWifi(ssid, password):
@@ -54,25 +41,15 @@ def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
         print(e)
 
 
-def mqtt_callback(topic, msg):
-    try:
-        data = json.loads(msg.decode())
-        print(data)
-        led2.on()
-        led1.on()
-        if topic == TOPIC:
-            wake_up(mac=data['mac'], broadcast=data['broadcast'], port=int(data['port']))
-            time.sleep(1)
-        led1.off()
-        led2.off()
-    except Exception as e:
-        print("err", e)
-        led1.off()
-        led2.off()
-
-
 def main():
-    global urequests, MQTTClient
+    global urequests
+    ssid = "test666"
+    password = "123456789"
+    mac = "E0-D5-5E-7D-B9-EA"
+    broadcast = "192.168.3.255"  # 广播地址
+    port = 9  # 7 或者 9
+    api = "http://106.12.129.198:5000"
+    key = "583a80ba213d9361891994488f7715e8"
     connectWifi(ssid=ssid, password=password)
     try:
         import urequests
@@ -81,16 +58,19 @@ def main():
         import upip
         upip.install("urequests")
         upip.install('micropython-umqtt.simple')
-    client = MQTTClient(client_id=TOPIC, server=SERVER, port=1883, keepalive=60)
-    client.set_callback(mqtt_callback)
-    client.connect()
-    client.subscribe(TOPIC)
     while True:
+        time.sleep_ms(10000)
         try:
-            client.check_msg()
+            resp = urequests.get(url=api + "/getstatus", params={"mac": mac, "key": key})
+            if str(resp.status_code) != "200":
+                continue
+            if resp.text == "1":
+                print("开机")
+                wake_up(mac=mac, broadcast=broadcast, port=port)
+                time.sleep_ms(10000)
+                urequests.get(url=api + "/setstatus", params={"mac": mac, "key": key, "status": 0})
         except Exception as e:
-            print(e)
-            time.sleep(1)
+            print("获取状态错误", e)
 
 
 if __name__ == '__main__':
