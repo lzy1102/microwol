@@ -15,8 +15,8 @@ led2.off()
 
 SERVER = 'broker.emqx.io'  # broker.mqttdashboard.com
 TOPIC = 'e9300a23c399722f4107ea1e457a6367'.encode()
-ssid = "test666"
-password = "123456789"
+ssid = "yangdabao"
+password = "lizhiyong418"
 
 
 def connectWifi(ssid, password):
@@ -29,7 +29,7 @@ def connectWifi(ssid, password):
         print(wlan.ifconfig())  # get the interface's IP/netmask/gw/DNS addresses
 
 
-def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
+def wake_up(mac='E0-D5-5E-7D-B9-EA', broadcast="192.168.1.255", port=9):
     if len(mac) != 17:
         raise ValueError("MAC address should be set as form 'XX-XX-XX-XX-XX-XX'")
     mac_address = mac.replace("-", '')
@@ -75,25 +75,28 @@ def mqtt_callback(topic, msg):
 
 
 def main():
-    global urequests, MQTTClient
-    connectWifi(ssid=ssid, password=password)
     try:
-        import urequests
-        from umqtt.simple import MQTTClient
-    except:
-        import upip
-        upip.install("urequests")
-        upip.install('micropython-umqtt.simple')
-    client = MQTTClient(client_id=TOPIC, server=SERVER, port=1883, keepalive=60)
-    client.set_callback(mqtt_callback)
-    client.connect()
-    client.subscribe(TOPIC)
-    while True:
+        global urequests, MQTTClient
+        connectWifi(ssid=ssid, password=password)
         try:
-            client.check_msg()
-        except Exception as e:
-            time.sleep(1)
-            machine.reset()
+            import urequests
+            from umqtt.simple import MQTTClient
+        except:
+            import upip
+            upip.install("urequests")
+            upip.install('micropython-umqtt.simple')
+        client = MQTTClient(client_id=TOPIC, server=SERVER, port=1883, keepalive=60)
+        client.set_callback(mqtt_callback)
+        client.connect()
+        client.subscribe(TOPIC)
+        while True:
+            try:
+                client.check_msg()
+            except Exception as e:
+                time.sleep(1)
+                machine.soft_reset()
+    except:
+        machine.soft_reset()
 
 
 if __name__ == '__main__':
