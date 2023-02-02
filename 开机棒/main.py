@@ -14,9 +14,9 @@ led2 = Pin(13, Pin.OUT)
 led2.off()
 
 SERVER = 'broker.emqx.io'  # broker.mqttdashboard.com
-TOPIC = 'e9300a23c399722f4107ea1e457a6367'.encode()
-ssid = "yangdabao"
-password = "lizhiyong418"
+TOPIC = '*************************************'.encode()
+ssid = "********"
+password = "**********"
 
 
 def connectWifi(ssid, password):
