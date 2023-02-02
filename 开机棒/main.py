@@ -93,6 +93,7 @@ def main():
             try:
                 client.check_msg()
             except Exception as e:
+                client.disconnect()
                 client = MQTTClient(client_id=TOPIC, server=SERVER, port=1883, keepalive=60)
                 client.set_callback(mqtt_callback)
                 client.connect()
