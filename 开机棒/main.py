@@ -1,6 +1,8 @@
 import socket
 
 import json
+
+import machine
 import network
 import time
 from machine import Pin
@@ -12,7 +14,7 @@ led2 = Pin(13, Pin.OUT)
 led2.off()
 
 SERVER = 'broker.emqx.io'  # broker.mqttdashboard.com
-TOPIC = '2f9ba5b550c97a5616c768db7b9aaa88'.encode()
+TOPIC = 'e9300a23c399722f4107ea1e457a6367'.encode()
 ssid = "test666"
 password = "123456789"
 
@@ -57,6 +59,7 @@ def wake_up(mac='DC-4A-3E-78-3E-0A', broadcast="192.168.1.255", port=7):
 def mqtt_callback(topic, msg):
     try:
         data = json.loads(msg.decode())
+        print("开机")
         print(data)
         led2.on()
         led1.on()
@@ -89,8 +92,8 @@ def main():
         try:
             client.check_msg()
         except Exception as e:
-            print(e)
             time.sleep(1)
+            machine.reset()
 
 
 if __name__ == '__main__':

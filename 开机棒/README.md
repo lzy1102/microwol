@@ -4,7 +4,6 @@ main.py 是需要上传到板子上的程序，主要配置有以下几项
 
 ```python
 SERVER = 'broker.emqx.io'  # mqtt 服务器地址
-MAC_ADDR = '40-E2-30-B1-31-E5'  # mac地址，
 TOPIC = '0622306f5a6a39ed99441934f532c8e1'.encode()   # 服务器获取到的key,mqtt的topic地址
 ssid = "test666"    # 自家wifi地址
 password = "123456789"  # 自家wifi 密码
