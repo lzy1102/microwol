@@ -5,8 +5,8 @@ from microdot import Microdot
 import _thread
 
 app = Microdot()
-ssid = "忆享科技-1"
-password = "yxkj@123"
+ssid = "***********"
+password = "***********"
 
 
 def connectWifi(ssid, password):
