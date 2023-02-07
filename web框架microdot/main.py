@@ -55,8 +55,9 @@ def initCheck():
     wifiList = wlan.scan()
     result = False
     for i in wifiList:
-        if i[0] in datas.keys():
-            result = connectWifi(ssid=i[0], password=datas[i[0]])
+        print(i[0].decode(), datas.keys())
+        if i[0].decode() in datas.keys():
+            result = connectWifi(ssid=i[0].decode(), password=datas[i[0].decode()])
             break
     return result
 
