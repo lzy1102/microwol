@@ -82,9 +82,11 @@ def main():
             import urequests
             from umqtt.simple import MQTTClient
         except:
-            import upip
-            upip.install("urequests")
-            upip.install('micropython-umqtt.simple')
+            try:
+                import upip
+                upip.install('micropython-umqtt.simple')
+            except:
+                pass
         client = MQTTClient(client_id=TOPIC, server=SERVER, port=1883, keepalive=60)
         client.set_callback(mqtt_callback)
         client.connect()

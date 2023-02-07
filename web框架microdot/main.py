@@ -1,12 +1,29 @@
+import json
 import time
-
 import network
 from microdot import Microdot
 import _thread
 
+datas = {}
+
+
+def initdata():
+    global datas
+    try:
+        with open("data.bat", "r+", encoding="utf-8") as f:
+            datas = json.loads(f.read())
+    except:
+        flush()
+        with open("data.bat", "r+", encoding="utf-8") as f:
+            datas = json.loads(f.read())
+
+
 app = Microdot()
-ssid = "***********"
-password = "***********"
+
+
+def flush():
+    with open("data.bat", "w+", encoding="utf-8") as f:
+        f.write(json.dumps(datas))
 
 
 def connectWifi(ssid, password):
@@ -22,27 +39,64 @@ def connectWifi(ssid, password):
 
 def startAP():
     wlan = network.WLAN(network.AP_IF)
-    wlan.config(essid="esp32ap-test",authmode=network.AUTH_WPA_WPA2_PSK,password="123456789")
+    wlan.active(False)
+    time.sleep(1)
+    wlan.active(True)
+    wlan.config(essid="esp32ap", authmode=network.AUTH_OPEN)
+    # wlan.config(essid="esp32ap", channel=11, authmode=network.AUTH_WPA_WPA2_PSK, hidden=False, password="123456789")
     print(wlan.ifconfig())
 
 
-@app.route("/scan", methods=['GET'])
-def index(request):
+def initCheck():
+    initdata()
     wlan = network.WLAN(network.STA_IF)
-
+    wlan.active(True)  # activate the interface
+    wlan.disconnect()
     wifiList = wlan.scan()
-    # for i in wifiList:
-    #     print(i)
-    return wifiList
+    result = False
+    for i in wifiList:
+        if i[0] in datas.keys():
+            result = connectWifi(ssid=i[0], password=datas[i[0]])
+            break
+    return result
+
+
+@app.route("/scan", methods=['GET'])
+def scan(request):
+    wlan = network.WLAN(network.STA_IF)  # create station interface
+    wifiList = wlan.scan()
+    result = []
+    for i in wifiList:
+        print(i[0].decode())
+        result.append(i[0].decode())
+    return result
+
+
+@app.route("/setwifi", methods=['GET'])
+def setWifi(request):
+    ssid = request.args.get('ssid')
+    pwd = request.args.get('pwd')
+    print(ssid, pwd)
+    try:
+        result = connectWifi(ssid=ssid, password=pwd)
+        if result:
+            datas[str(ssid)] = str(pwd)
+            flush()
+        return {"result": result}
+    except Exception as e:
+        return {"error": e}
+    finally:
+        app.shutdown()
 
 
 def main():
-    startAP()
+    if initCheck() is False:
+        time.sleep(1)
+        startAP()
+        # _thread.start_new_thread(app.run, ())
+        app.run()
     time.sleep(1)
-    connectWifi(ssid=ssid, password=password)
-
-    _thread.start_new_thread(app.run, ())
-    # app.run()
+    print("连接WiFi")
     while True:
         time.sleep(10)
 
