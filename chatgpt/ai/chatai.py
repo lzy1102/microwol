@@ -7,6 +7,7 @@ from ai.aibase import AiBase
 
 class ChatAI(AiBase):
     def __init__(self, user, pwd, proxy):
+        print("browsers", user)
         super().__init__()
         self.type = WorkingType.Browsers
         self.password = pwd
@@ -90,7 +91,7 @@ class ChatAI(AiBase):
             resp = self.api.send_message(msg)
 
             if len(resp['message']) > 400:
-                for i in range(3):
+                for i in range(2):
                     t = self.api.send_message("继续")
                     last = resp['message']
                     resp['message'] = last + t['message']

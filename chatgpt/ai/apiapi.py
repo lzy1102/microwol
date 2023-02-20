@@ -11,6 +11,7 @@ class ApiAI(AiBase):
 
     def __init__(self, key):
         super().__init__()
+        print("token",key)
         self.type = WorkingType.Api
         self.key = key
         openai.api_key = key
@@ -30,7 +31,7 @@ class ApiAI(AiBase):
             # text-davinci-003
             # text-davinci-002-render
             completion = openai.Completion.create(engine="text-davinci-003", prompt=msg, max_tokens=4000,
-                                                  temperature=0.2)
+                                                  temperature=0.5)
             # print the completion
             # with open("completion.json", mode="w+", encoding="utf-8") as f:
             #     f.write(json.dumps(completion))
