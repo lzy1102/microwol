@@ -73,7 +73,7 @@ def chat():
 
 
 if __name__ == '__main__':
-    # app.add_url_rule('/', 'webio_view', webio_view(chat), methods=['GET', 'POST'])
+    app.add_url_rule('/', 'webio_view', webio_view(chat), methods=['GET', 'POST'])
     app.run(host="0.0.0.0", port=5000)
     # server = pywsgi.WSGIServer(('0.0.0.0', 5000), app)
     # server.serve_forever()
