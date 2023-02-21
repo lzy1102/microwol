@@ -16,7 +16,7 @@ from ai.status import WorkingStatus
 
 aiPool = ai.pool.AiPool(cfgpath="config.yaml").poolMap
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", static_url_path="/static")
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # 配置1天有效
 # app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
@@ -26,39 +26,11 @@ app.config['timeout'] = 60 * 60
 aiList = [i for i in aiPool.values()]
 
 
-@app.route("/api/conversation", methods=['POST'])
-def send():
-    set_config = request.get_data()
-    if set_config is None or set_config == "":
-        return []
-    set_config = json.loads(set_config)
-
-    # msg = request.form.get("msg")
-    msg = set_config['message']
-    print(msg)
-
-    while True:
-        aiIndex = random.randint(0, len(aiList) - 1)
-        aiObj = aiList[aiIndex]
-        if aiObj.status == WorkingStatus.Idle:
-            tmpai = aiObj
-            break
-
-    # for i in aiPool.values():
-    #     if i.status == WorkingStatus.Idle:
-    #         tmpai = i
-    #         break
-    resp = tmpai.send(msg=msg)
-    print(resp)
-    result = {"message": resp['message'], "conversationId": resp['id'], "parentMessageId": set_config["conversationId"]}
-    return result, 200
-
-
 def chat():
     put_markdown('## PyWebIO Chat')
     while True:
         user_input = input("Your message:", type=TEXT)
-        put_markdown("img/you.jpg: " + user_input)
+        put_markdown("![you](/static/img/you.jpg) " + user_input)
         # tmpai = None
         while True:
             aiIndex = random.randint(0, len(aiList) - 1)
@@ -68,7 +40,7 @@ def chat():
                 break
         resp = tmpai.send(msg=user_input)
         received_msg = resp['message']
-        put_markdown("img/ai.png: " + received_msg)
+        put_markdown("![ai](/static/img/ai.png) " + received_msg)
         put_text("**************************************************************************************************")
 
 
