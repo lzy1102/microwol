@@ -27,21 +27,19 @@ aiList = [i for i in aiPool.values()]
 
 
 def chat():
-    put_markdown('## PyWebIO Chat')
+    user_input = input("Your message:", type=TEXT)
+    put_markdown("![you](/static/img/you.jpg) " + user_input)
     while True:
-        user_input = input("Your message:", type=TEXT)
-        put_markdown("![you](/static/img/you.jpg) " + user_input)
-        # tmpai = None
-        while True:
-            aiIndex = random.randint(0, len(aiList) - 1)
-            aiObj = aiList[aiIndex]
-            if aiObj.status == WorkingStatus.Idle:
-                tmpai = aiObj
-                break
-        resp = tmpai.send(msg=user_input)
-        received_msg = resp['message']
-        put_markdown("![ai](/static/img/ai.png) " + received_msg)
-        put_text("**************************************************************************************************")
+        aiIndex = random.randint(0, len(aiList) - 1)
+        aiObj = aiList[aiIndex]
+        if aiObj.status == WorkingStatus.Idle:
+            tmpai = aiObj
+            break
+    resp = tmpai.send(msg=user_input)
+    received_msg = resp['message']
+    put_markdown("![ai](/static/img/ai.png) " + received_msg)
+    put_text("**************************************************************************************************")
+    chat()
 
 
 if __name__ == '__main__':
