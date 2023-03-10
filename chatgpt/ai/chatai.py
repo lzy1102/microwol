@@ -1,6 +1,8 @@
 import json
+import platform
 
-from pyChatGPT import ChatGPT
+from ai.pyChatGPT import ChatGPT
+# from pyChatGPT import ChatGPT
 from ai.status import WorkingStatus, WorkingType
 from ai.aibase import AiBase
 
@@ -13,9 +15,16 @@ class ChatAI(AiBase):
         self.password = pwd
         self.user = user
         self.proxy = proxy
-        self.api = ChatGPT(auth_type="openai", email=self.user, password=self.password, proxy=self.proxy,
-                           chrome_args=['--no-sandbox', '--headless', '--disable-dev-shm-usage', '--disable-gpu',
-                                        '--disable-gpu'])
+        # linux
+        if platform.system() == 'Linux':
+            print('当前操作系统是 Linux')
+            self.api = ChatGPT(auth_type="openai", email=self.user, password=self.password, proxy=self.proxy,
+                               chrome_args=['--no-sandbox', '--headless', '--disable-dev-shm-usage', '--disable-gpu',
+                                            '--disable-gpu'])
+        elif platform.system() == 'Windows':
+            print('当前操作系统是 Windows')
+            self.api = ChatGPT(auth_type="openai", email=self.user, password=self.password, proxy=self.proxy,
+                               chrome_args=[])
         self.api.reset_conversation()
         self.user = user
         self.password = pwd
@@ -90,11 +99,11 @@ class ChatAI(AiBase):
         try:
             resp = self.api.send_message(msg)
 
-            if len(resp['message']) > 400:
-                for i in range(2):
-                    t = self.api.send_message("继续")
-                    last = resp['message']
-                    resp['message'] = last + t['message']
+            # if len(resp['message']) > 400:
+            #     for i in range(2):
+            #         t = self.api.send_message("继续")
+            #         last = resp['message']
+            #         resp['message'] = last + t['message']
 
             # print(resp['message'])
             # with open("resp.json", mode="w+", encoding="utf-8") as f:
