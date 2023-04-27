@@ -12,6 +12,9 @@ class AiBase(object):
     def send(self, msg):
         pass
 
+    def send2(self, msg):
+        pass
+
 
 if __name__ == '__main__':
     pass

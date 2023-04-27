@@ -15,7 +15,6 @@ import time
 import re
 import os
 
-
 cf_challenge_form = (By.ID, 'challenge-form')
 
 chatgpt_textbox = (By.TAG_NAME, 'textarea')
@@ -32,7 +31,12 @@ chatgpt_login_btn = (By.XPATH, '//div[text()="Log in"]')
 chatgpt_login_h1 = (By.XPATH, '//h1[text()="Welcome back"]')
 chatgpt_logged_h1 = (By.XPATH, '//h1[text()="ChatGPT"]')
 
+# 刷新后，出来弹窗
+chatgpt_research_next_btn = (By.XPATH, '//div[text()="Next"]')
+chatgpt_research_done_btn = (By.XPATH, '//div[text()="Done"]')
+
 chatgpt_new_chat = (By.LINK_TEXT, 'New chat')
+chatgpt_setting_menu_btn = (By.XPATH,  "//[@id='headlessui-menu-button-' and contains(@id, 'headlessui-menu-button-') and starts-with(@id, 'headlessui-menu-button-')]")
 chatgpt_clear_convo = (By.LINK_TEXT, 'Clear conversations')
 chatgpt_confirm_clear_convo = (By.LINK_TEXT, 'Confirm clear conversations')
 chatgpt_chats_list_first_node = (
@@ -49,19 +53,19 @@ class ChatGPT:
     '''
 
     def __init__(
-        self,
-        session_token: str = None,
-        conversation_id: str = '',
-        auth_type: str = None,
-        email: str = None,
-        password: str = None,
-        login_cookies_path: str = '',
-        captcha_solver: str = 'pypasser',
-        solver_apikey: str = '',
-        proxy: str = None,
-        chrome_args: list = [],
-        moderation: bool = True,
-        verbose: bool = False,
+            self,
+            session_token: str = None,
+            conversation_id: str = '',
+            auth_type: str = None,
+            email: str = None,
+            password: str = None,
+            login_cookies_path: str = '',
+            captcha_solver: str = 'pypasser',
+            solver_apikey: str = '',
+            proxy: str = None,
+            chrome_args: list = [],
+            moderation: bool = True,
+            verbose: bool = False,
     ):
         '''
         Initialize the ChatGPT object\n
@@ -93,7 +97,7 @@ class ChatGPT:
         self.__moderation = moderation
 
         if not self.__session_token and (
-            not self.__email or not self.__password or not self.__auth_type
+                not self.__email or not self.__password or not self.__auth_type
         ):
             raise ValueError(
                 'Please provide either a session token or login credentials'
@@ -105,7 +109,7 @@ class ChatGPT:
         if self.__captcha_solver == '2captcha' and not self.__solver_apikey:
             raise ValueError('Please provide a 2captcha apikey')
         if self.__proxy and not re.findall(
-            r'(https?|socks(4|5)?):\/\/.+:\d{1,5}', self.__proxy
+                r'(https?|socks(4|5)?):\/\/.+:\d{1,5}', self.__proxy
         ):
             raise ValueError('Invalid proxy format')
         if self.__auth_type == 'openai' and self.__captcha_solver == 'pypasser':
@@ -262,7 +266,7 @@ class ChatGPT:
             response = self.driver.find_element(By.TAG_NAME, 'pre').text
         response = json.loads(response)
         if (not response) or (
-            'error' in response and response['error'] == 'RefreshAccessTokenError'
+                'error' in response and response['error'] == 'RefreshAccessTokenError'
         ):
             self.logger.debug('Authorization is invalid')
             if not self.__auth_type:
@@ -350,8 +354,8 @@ class ChatGPT:
         while self.__is_active:
             self.logger.debug('Updating session...')
             payload = (
-                '{"event":"session","data":{"trigger":"getSession"},"timestamp":%d}'
-                % int(time.time())
+                    '{"event":"session","data":{"trigger":"getSession"},"timestamp":%d}'
+                    % int(time.time())
             )
             try:
                 self.driver.execute_script(
@@ -394,7 +398,7 @@ class ChatGPT:
             response = self.driver.find_elements(*chatgpt_small_response)[-1]
             content = response.text
             if content != prev_content:
-                yield content[len(prev_content) :]
+                yield content[len(prev_content):]
                 prev_content = content
             if not result_streaming:
                 break
@@ -407,9 +411,24 @@ class ChatGPT:
         '''
         self.logger.debug('Ensuring Cloudflare cookies...')
         self.__ensure_cf()
-
+        # 新增，循环点击弹窗
+        for i in range(0, 5):
+            try:
+                if EC.presence_of_element_located(chatgpt_research_next_btn):
+                    next_btn = self.driver.find_element(*chatgpt_research_next_btn)
+                    next_btn.click()
+            except:
+                pass
+            try:
+                # 判断是否存在Done按钮，如果存在，则点击Done按钮
+                if EC.presence_of_element_located(chatgpt_research_done_btn):
+                    done_btn = self.driver.find_element(*chatgpt_research_done_btn)
+                    done_btn.click()
+            except:
+                pass
+            time.sleep(1)
         self.logger.debug('Sending message...')
-        textbox = WebDriverWait(self.driver, 5).until(
+        textbox = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(chatgpt_textbox)
         )
         textbox.click()
@@ -442,7 +461,10 @@ class ChatGPT:
             if 'text-red' in response.get_attribute('class'):
                 self.logger.debug('Response is an error')
                 raise ValueError(response.text)
-        response = self.driver.find_elements(*chatgpt_small_response)[-1]
+        try:
+            response = self.driver.find_elements(*chatgpt_small_response)[-1]
+        except:
+            return {}
 
         content = markdownify(response.get_attribute('innerHTML')).replace(
             'Copy code`', '`'
@@ -458,7 +480,10 @@ class ChatGPT:
             ).click()
             time.sleep(0.5)
             matches = pattern.search(self.driver.current_url)
-        conversation_id = matches.group()
+        try:
+            conversation_id = matches.group()
+        except:
+            conversation_id = None
         return {'message': content, 'conversation_id': conversation_id}
 
     def reset_conversation(self) -> None:
@@ -481,7 +506,10 @@ class ChatGPT:
         '''
         if not self.driver.current_url.startswith(chatgpt_chat_url):
             return self.logger.debug('Current URL is not chat page, skipping clear')
-
+        try:
+            self.driver.find_element(*chatgpt_setting_menu_btn).click()
+        except:
+            self.logger.debug("Setting menu btn not found")
         self.logger.debug('Clearing conversations...')
         try:
             self.driver.find_element(*chatgpt_clear_convo).click()

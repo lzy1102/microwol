@@ -14,7 +14,7 @@ class ApiAI(AiBase):
         print("token", key)
         self.type = WorkingType.Api
         self.key = key
-        openai.organization = organization
+        # openai.organization = organization
         openai.api_key = key
         # list engines
         # engines = openai.Engine.list()
@@ -54,9 +54,11 @@ class ApiAI(AiBase):
         finally:
             self.status = WorkingStatus.Idle
 
+    def send2(self, msg):
+        super().send2(msg)
 
 if __name__ == '__main__':
-    aai = ApiAI(organization="", key="")
+    aai = ApiAI(organization="org-8rKQKfiw1xSwADwb3jgcbZCk", key="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")
     print(aai.key)
     print(aai.status)
-    print(aai.send(msg="如何提高工作效率用中文回答"))
+    print(aai.send(msg="如何认识农民起义"))

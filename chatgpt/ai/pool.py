@@ -7,21 +7,20 @@ from ai.chatai import ChatAI
 from ai.apiapi import ApiAI
 from ai.status import WorkingStatus, WorkingType
 
-
 class AiPool(object):
     def __init__(self, cfgpath):
         with open(cfgpath, mode="r+", encoding="utf-8") as f:
             config = yaml.load(f, yaml.FullLoader)
-        self.poolMap = {}
+        self.poolMap = dict()
         print(config, "browsers" in config and len(config['browsers']) > 0)
         if "browsers" in config and len(config['browsers']) > 0:
             for browser in config['browsers']:
                 self.poolMap[browser['user']+"_browser"] = ChatAI(user=browser['user'], pwd=browser['password'],
-                                                       proxy=browser['proxy'])
+                                                       proxy=browser['proxy'],session_token=browser['session_token'])
         else:
             # api
             for api in config['keys']:
-                self.poolMap[api['user']+"_key"] = ApiAI(key=api['key'])
+                self.poolMap[api['user']+"_key"] = ApiAI( organization=None, key=api['key'])
 
 
 if __name__ == '__main__':
