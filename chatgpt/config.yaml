@@ -2,6 +2,7 @@ browsers:
   - proxy: http://v2raya:20171
     user: "***********@gmail.com"
     password: "******************"
+    session_token:
 keys:
 #  - user: *******@gmail.com
 #    key: ******************************************
